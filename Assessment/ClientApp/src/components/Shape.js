@@ -20,10 +20,10 @@
 //        </div>
 //    );
 //}
-function Shape() {
+function Shape(props) {
     const canvas = useRef(null);
     let ctx = null;  
-    let shapeDimensions = null;
+    let shapeDimensions = { x: 200, y: 200, w: 250, h: 250 };
     let shapeStyle = { borderColor: 'red', borderWidth: 10 };
     let updatedStyle = { borderColor: 'blue', borderWidth: 10 };
     let dragTarget = null;
@@ -31,9 +31,26 @@ function Shape() {
     let clickX = null;
     let clickY = null;
 
+    let selectedShape = props.shape;
+
+    let startColor = props.startColor;
+    let moveColor = props.moveColor;
+    let edgeColor = props.edgeColor;
+
+    let startStyle = { borderColor: startColor, borderWidth: 10, backgroundColor: startColor };
+    let moveStyle = { borderColor: moveColor, borderWidth: 10, backgroundColor: moveColor };
+    let edgeStyle = { borderColor: edgeColor, borderWidth: 10, backgroundColor: edgeColor };
+
+
     //init the canvas
     useEffect(() => {
-        // dynamically assign the width and height to canvas
+        initializeCanvas();
+    }, [props]);
+    
+    const initializeCanvas = () => {
+        if (ctx != null) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
         const canvasEle = canvas.current;
         canvasEle.width = canvasEle.clientWidth;
         canvasEle.height = canvasEle.clientHeight;
@@ -46,22 +63,27 @@ function Shape() {
         shapeDimensions = { x: canvasCenterX, y: canvasCenterY, w: shapeWidth, h: shapeHeight };
         // get context of the canvas
         ctx = canvasEle.getContext("2d");
-    }, []);
+        if (selectedShape == 'Rectangle') {
+            drawRect(shapeDimensions, startStyle);
+        }
+        if (selectedShape == 'Circle') {
+            drawRect(shapeDimensions, startStyle);
+        }
+
+    } 
 
     //Draw the Rectangle after the canvas has been initialized
-    useEffect(() => {
-        drawRect(shapeDimensions, shapeStyle);
-    }, []);
 
     //Function to draw the Rectangle using the provided dimensions and styles.
     const drawRect = (info, style = {}) => {
         const { x, y, w, h } = info;
-        const { borderColor = 'black', borderWidth = 1 } = style;
-        console.log(info);
+        const { borderColor = 'black', borderWidth = 1, backgroundColor = "black" } = style;
         ctx.beginPath();
         ctx.strokeStyle = borderColor;
         ctx.lineWidth = borderWidth;
         ctx.rect(x, y, w, h);
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(x, y, w, h);
         ctx.stroke();
     }
 
@@ -96,10 +118,10 @@ function Shape() {
     const drawShape = () => {
         ctx.clearRect(0, 0, canvas.current.clientWidth, canvas.current.clientHeight);
         if (shapeDimensions.x > 0 && shapeDimensions.y > 0 && shapeDimensions.x + shapeDimensions.w < canvas.current.width && shapeDimensions.y + shapeDimensions.h < canvas.current.height) {
-            drawRect(shapeDimensions)
+            drawRect(shapeDimensions, moveStyle)
         }
         else {
-            drawRect(shapeDimensions, updatedStyle)
+            drawRect(shapeDimensions, edgeStyle)
         }
     }
 
@@ -114,7 +136,6 @@ function Shape() {
 
     return(
         <div className="App">
-            <h3>Draw a rectangle on Canvas - <a href="http://www.cluemediator.com" target="_blank" rel="noopener noreferrer">Clue Mediator</a></h3>
             <canvas
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}

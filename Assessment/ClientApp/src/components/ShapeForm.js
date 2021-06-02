@@ -15,7 +15,7 @@ function ShapeForm(props) {
                     <Label for="shapeSelect">Choose Shape:</Label>
                     <Input type="select" name="select" id="shapeSelect" onChange={props.onChange}>
                         {props.shapes.map(shape =>
-                            <option key={shape.id} value={shape.name}>{shape.name}</option>
+                            <option key={shape.id} value={shape.id}>{shape.name}</option>
                         )}
                     </Input>
                     <Label for="startColorSelect">Choose Starting Color:</Label>

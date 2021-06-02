@@ -6,62 +6,44 @@ import './ShapeApp.css';
 export class ShapeApp extends Component {
 
     constructor(props) {
-        const shapes = [
-            {
-                "id": 1,
-                "name": "Rectangle",
-                "dimensions": {
-                    "height": 100,
-                    "width": 50
-                }
-            },
-            {
-                "id": 2,
-                "name": "Circle",
-                "dimensions": {
-                    "height": 100,
-                    "width": 50
-                }
-            },
-            {
-                "id": 3,
-                "name": "Square",
-                "dimensions": {
-                    "height": 100,
-                    "width": 50
-                }
-            }
-        ]
-        const colors = [
-            "blue",
-            "red",
-            "black",
-            "pink",
-            "purple"
-        ]
         super(props);
         this.state = {
-            shapes: shapes,
-            colors: colors, 
-            selectedShape: "Rectangle",
+            shapes: [],
+            colors: [], 
+            selectedShape: {
+                Id: 0, shape: {}
+            },
             startColor: "",
             moveColor: "",
-            edgeColor: ""
+            edgeColor: "",
+            isLoading: true
         };
-        //this.handleChange = this.handleChange.bind(this);
-        //fetch('api/SampleData/WeatherForecasts')
-        //    .then(response => response.json())
-        //    .then(data => {
-        //        this.setState({ forecasts: data, loading: false });
-        //    });
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    async componentDidMount() {
+        fetch('api/shapes')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    shapes: data.shapes,
+                    selectedShape: data.shapes[0],
+                    colors: data.colors,
+                    startColor: data.colors[0],
+                    moveColor: data.colors[0],
+                    edgeColor: data.colors[0],
+                    isLoading: false
+                });
+            });
     }
 
     handleChange = (event) => {
-        debugger;
         switch (event.target.id) {
             case "shapeSelect":
-                // code block
-                this.setState({ selectedShape: event.target.value })
+                debugger;
+                let currentShape = this.state.shapes.find(s => s.id == event.target.value);
+                debugger;
+                this.setState({ selectedShape: currentShape })
                 break;
             case "startColorSelect":
                 this.setState({ startColor: event.target.value }) 
@@ -78,11 +60,17 @@ export class ShapeApp extends Component {
     }
 
     render() {
-        return (
-            <div>
-                <ShapeForm shapes={this.state.shapes} colors={this.state.colors} selectedColors={this.state.selectedColors} onChange={this.handleChange} />
-                <Shape startColor={this.state.startColor} moveColor={this.state.moveColor} edgeColor={this.state.edgeColor} shape={this.state.selectedShape} />
-            </div>
-        );
+        if (this.state.isLoading) {
+            return <div>Loading...</div>
+        }
+        else {
+            return (
+                <div>
+                    <ShapeForm shapes={this.state.shapes} colors={this.state.colors} selectedColors={this.state.selectedColors} onChange={this.handleChange} />
+                    <Shape startColor={this.state.startColor} moveColor={this.state.moveColor} edgeColor={this.state.edgeColor} shape={this.state.selectedShape} />
+                </div>
+
+            );
+        }
     }
 }

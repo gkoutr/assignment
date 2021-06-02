@@ -23,7 +23,9 @@
 function Shape(props) {
     const canvas = useRef(null);
     let ctx = null;  
-    let shapeDimensions = { x: 200, y: 200, w: 250, h: 250 };
+    let shapeDimensions =  null;
+    let squareDimensions = null;
+    
     let shapeStyle = { borderColor: 'red', borderWidth: 10 };
     let updatedStyle = { borderColor: 'blue', borderWidth: 10 };
     let dragTarget = null;
@@ -55,33 +57,32 @@ function Shape(props) {
         canvasEle.width = canvasEle.clientWidth;
         canvasEle.height = canvasEle.clientHeight;
 
-        let shapeWidth = 100;
-        let shapeHeight = 50
+        let shapeWidth = selectedShape.dimensions.width;
+        let shapeHeight = selectedShape.dimensions.height
         //set the shapeDimensions at the center of the canvas to start
         let canvasCenterX = (canvas.current.clientWidth / 2) - shapeWidth / 2;
         let canvasCenterY = (canvas.current.clientHeight / 2) - shapeHeight / 2;
-        shapeDimensions = { x: canvasCenterX, y: canvasCenterY, w: shapeWidth, h: shapeHeight };
         // get context of the canvas
         ctx = canvasEle.getContext("2d");
-        if (selectedShape == 'Rectangle') {
-            drawRect(shapeDimensions, startStyle);
+        if (selectedShape.name == 'Rectangle') {
+            shapeDimensions = { x: canvasCenterX, y: canvasCenterY, w: shapeWidth, h: shapeHeight };
+            drawShape(shapeDimensions, startStyle);
         }
-        if (selectedShape == 'Circle') {
-            drawRect(shapeDimensions, startStyle);
+        if (selectedShape.name == 'Square') {
+            shapeDimensions = { x: canvasCenterX, y: canvasCenterY, w: 100, h: 100 };
+            drawShape(shapeDimensions, startStyle);
         }
-
     } 
 
-    //Draw the Rectangle after the canvas has been initialized
-
-    //Function to draw the Rectangle using the provided dimensions and styles.
-    const drawRect = (info, style = {}) => {
+    //Function to draw the shape using the provided dimensions and styles.
+    const drawShape = (info, style = {}) => {
         const { x, y, w, h } = info;
         const { borderColor = 'black', borderWidth = 1, backgroundColor = "black" } = style;
         ctx.beginPath();
         ctx.strokeStyle = borderColor;
         ctx.lineWidth = borderWidth;
         ctx.rect(x, y, w, h);
+        
         ctx.fillStyle = backgroundColor;
         ctx.fillRect(x, y, w, h);
         ctx.stroke();
@@ -100,6 +101,7 @@ function Shape(props) {
 
     //Moves the shape by updating the x and y of the Shape. 
     //X and Y determined by the current mouse location - where the click took place
+    //Draws the shape, if the shape is on the edge of the canvas then the shape will change color
     const handleMouseMove = e => {
         if (!holdClick) return;
        
@@ -111,17 +113,12 @@ function Shape(props) {
         clickY = mouseY;
         dragTarget.x += dx;
         dragTarget.y += dy;
-        drawShape();
-    }
-
-    //Draws the shape, if the shape is on the edge of the canvas then the shape will change color
-    const drawShape = () => {
         ctx.clearRect(0, 0, canvas.current.clientWidth, canvas.current.clientHeight);
         if (shapeDimensions.x > 0 && shapeDimensions.y > 0 && shapeDimensions.x + shapeDimensions.w < canvas.current.width && shapeDimensions.y + shapeDimensions.h < canvas.current.height) {
-            drawRect(shapeDimensions, moveStyle)
+            drawShape(shapeDimensions, moveStyle)
         }
         else {
-            drawRect(shapeDimensions, edgeStyle)
+            drawShape(shapeDimensions, edgeStyle)
         }
     }
 

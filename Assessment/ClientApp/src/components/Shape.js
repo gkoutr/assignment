@@ -1,30 +1,9 @@
 ﻿import React, { useRef, useEffect } from 'react';
 
-//function InitCanvas() {
-//    const canvas = useRef();
-//    let ctx = null;
-//    useEffect(() => {
-//        // dynamically assign the width and height to canvas
-//        const canvasEle = canvas.current;
-//        canvasEle.width = canvasEle.clientWidth;
-//        canvasEle.height = canvasEle.clientHeight;
-
-//        // get context of the canvas
-//        ctx = canvasEle.getContext("2d");
-//    }, []);
-
-//    return (
-//        <div className="App">
-//            <h3>Draw a rectangle on Canvas - <a href="http://www.cluemediator.com" target="_blank" rel="noopener noreferrer">Clue Mediator</a></h3>
-//            <canvas ref={canvas}></canvas>
-//        </div>
-//    );
-//}
 function Shape(props) {
     const canvas = useRef(null);
     let ctx = null;  
     let shapeDimensions =  null;
-    let squareDimensions = null;
     
     let shapeStyle = { borderColor: 'red', borderWidth: 10 };
     let updatedStyle = { borderColor: 'blue', borderWidth: 10 };
@@ -50,7 +29,7 @@ function Shape(props) {
     }, [props]);
     
     const initializeCanvas = () => {
-        if (ctx != null) {
+        if (ctx != null) {canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
         const canvasEle = canvas.current;
